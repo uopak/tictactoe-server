@@ -34,10 +34,12 @@ async function connectDB() {
   var databaseURL = "mongodb://localhost:27017/tictactoe";
 
   try {
-    const database = await MongoClient.connect(databaseURL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    const database = await MongoClient.connect(databaseURL
+      //{
+      // useNewUrlParser: true,
+      // useUnifiedTopology: true
+      //}
+  );
     console.log("DB 연결 완료: " + databaseURL);
     app.set('database', database.db('tictactoe'));
 
