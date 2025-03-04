@@ -11,7 +11,7 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
-// MongoDB 연결
+// MongoDB
 async function connectDB() {
   var databaseURL = "mongodb://localhost:27017/tictactoe";
 
@@ -21,6 +21,7 @@ async function connectDB() {
       useUnifiedTopology: true
     });
     console.log("DB 연결 완료: " + databaseURL);
+    app.set('database', database.db('tictactoe'));
 
     // 연결 종료 처리
     process.on("SIGINT", async () => {
