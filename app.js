@@ -8,8 +8,26 @@ var MongoClient = mongodb.MongoClient;  // 추가
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const session = require('express-session');
+var fileStore = require('session-file-store')(session);
 
 var app = express();
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'session-login',
+  resave: false,
+  saveUninitialized: false,
+  store: new fileStore({
+    path: './sessions',
+    ttl: 24 * 60 * 60,
+    reapInterval: 60 * 60
+  }),
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000
+  }
+}));
 
 // MongoDB
 async function connectDB() {
