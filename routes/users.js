@@ -96,5 +96,38 @@ router.post('/signout', function(req, res, next) {
   });
 });
 
+// 점수 추가
+router.post('/addscore', async function(req, res, next) {
+  try {
+    if (!req.isAuthenticated) {
+      return res.status(400).send("로그인이 필요합니다.");
+    }
+    var userId = req.session.userId;
+    var score = req.body.score;
+    // 점수 유효성 검사
+    if (!score || isNaN(score)) {
+      return res.status(400).send("유효한 점수를 입력해주세요.");
+    }
+    var database = req.app.get('database');
+    var users = database.collection('users');
+    const result = await users.updateOne(
+      { _id: userId },
+      {
+        $set: {
+          score: Number(score),
+          updatedAt: new Date()
+        }
+      }
+    );
+    if (result.matchedCount === 0) {
+      return res.status(400).send("사용자를 찾을 수 없습니다.");
+    }
+    res.status(200).json({ message: "점수가 성공적으로 업데이트 되었습니다." });  
+  } catch (err) {
+    console.error("점수 추가 중 오류 발생: ", err);
+    res.status(500).send("서버 오류가 발생했습니다.");
+  }
+});
+
 
 module.exports = router;
