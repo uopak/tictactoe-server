@@ -27,12 +27,26 @@ module.exports = function(server) {
         });
 
         socket.on('sendMessage', function(message) {
-            console.log('메시지를 받았습니다: ' + message.nickName + ' : ' + message.message + ' : ' + message.roomId);
+            console.log('메시지를 받았습니다: ' + message.roomId + ' ' + message.nickName + ' : ' + message.message);
             socket.to(message.roomId).emit('receiveMessage', { nickName: message.nickName, message: message.message });
         });
 
         socket.on('disconnect', function() {
             console.log('사용자가 연결을 끊었습니다.');
+
+            var socketRooms = Array.from(socket.rooms).filter(room => room !== socket.id);
+
+            socketRooms.forEach(function(roomId) {
+                socket.to(roomId).emit('gameEnded', { userId: socket.id })
+                
+                const roomSize = io.sockets.adapter.rooms.get(roomId).size || 0;
+                if (roomSize <= 1) {
+                    const idx = rooms.indexOf(roomId);
+                    if (idx !== -1) {
+                        rooms.splice(idx, 1);
+                    }
+                }
+            });
         });
     });
 }
